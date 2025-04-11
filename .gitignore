@@ -76,3 +76,7 @@ htmlcov/
 # *.tsv
 # data/*.csv
 # data/*.xlsx
+
+
+# windsurf rules
+.windsurfrules

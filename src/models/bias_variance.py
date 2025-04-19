@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import learning_curve, validation_curve
+from sklearn.model_selection import learning_curve, validation_curve, train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score
 import seaborn as sns
 
@@ -196,16 +196,16 @@ def diagnose_bias_variance(estimator, X_train, y_train, X_test, y_test):
     
     return diagnosis
 
-def plot_complexity_analysis(model_class, param_name, param_range, X_train, y_train, X_test, y_test, random_state=42):
+def plot_complexity_analysis(model_class, X_train, X_test, y_train, y_test, 
+                            param_name, param_range, random_state=42):
     """
     Analiza cómo cambia el rendimiento del modelo con diferentes niveles de complejidad.
     
     Args:
         model_class: Clase del modelo (no instanciado)
+        X_train, X_test, y_train, y_test: Datos de entrenamiento y prueba
         param_name: Nombre del parámetro de complejidad (ej: 'max_depth')
         param_range: Lista de valores para el parámetro
-        X_train, y_train: Datos de entrenamiento
-        X_test, y_test: Datos de prueba
         random_state: Semilla aleatoria
         
     Returns:
@@ -244,24 +244,37 @@ def plot_complexity_analysis(model_class, param_name, param_range, X_train, y_tr
 
 if __name__ == "__main__":
     import pandas as pd
-    from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import train_test_split, cross_val_score
     from sklearn.tree import DecisionTreeClassifier
     
     # Cargar datos procesados
     df = pd.read_csv(PROCESSED_DATA_DIR / "startup_data_processed.csv")
     
+    # Identificar columnas que podrían causar fuga de datos
+    future_info_cols = [col for col in df.columns if 'closed_at_' in col]
+    id_cols = [col for col in df.columns if 'id_c:' in col]
+    
+    print(f"Eliminando {len(future_info_cols)} columnas con información futura (closed_at_)")
+    print(f"Eliminando {len(id_cols)} columnas de identificadores específicos")
+    
     # Separar features y target
-    X = df.drop(TARGET_COLUMN, axis=1)
+    X = df.drop([TARGET_COLUMN, 'labels'] + future_info_cols + id_cols, axis=1)
     y = df[TARGET_COLUMN]
+    
+    print(f"Dimensiones del conjunto de datos después de la limpieza: {X.shape}")
     
     # División en train-test
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y)
     
-    print("Analizando sesgo-varianza para el modelo de árbol de decisión...")
+    print("\nAnalizando sesgo-varianza para el modelo de árbol de decisión...")
     
-    # Entrenar modelo
-    dt_classifier = DecisionTreeClassifier(random_state=RANDOM_STATE)
+    # Entrenar modelo con parámetros optimizados para reducir sobreajuste
+    dt_classifier = DecisionTreeClassifier(
+        max_depth=5,  # Limitar la profundidad
+        min_samples_leaf=15,  # Requerir más muestras por nodo hoja
+        random_state=RANDOM_STATE
+    )
     dt_classifier.fit(X_train, y_train)
     
     # Diagnóstico
@@ -270,16 +283,36 @@ if __name__ == "__main__":
     for key, value in diagnosis.items():
         print(f"{key}: {value}")
     
+    # Evaluación con validación cruzada para una estimación más robusta
+    cv_scores = cross_val_score(dt_classifier, X, y, cv=5, scoring='accuracy')
+    print(f"\nPrecisión con validación cruzada (5-fold): {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+    
     # Análisis de complejidad
     print("\nRealizando análisis de complejidad...")
     max_depths = [1, 2, 3, 5, 10, None]
     plt = plot_complexity_analysis(
         DecisionTreeClassifier,
-        'max_depth',
-        max_depths,
-        X_train, y_train,
-        X_test, y_test,
+        X_train, X_test, y_train, y_test,
+        param_name="max_depth",
+        param_range=max_depths,
         random_state=RANDOM_STATE
     )
-    plt.savefig('complexity_analysis.png')
-    print("Análisis de complejidad guardado como 'complexity_analysis.png'")
+    
+    # Guardar gráfico
+    plt.savefig(FIGURES_DIR / "complexity_analysis.png", dpi=300, bbox_inches="tight")
+    print(f"Análisis de complejidad guardado como 'complexity_analysis.png'")
+    
+    # Mostrar las 20 características más importantes
+    if hasattr(dt_classifier, 'feature_importances_'):
+        importances = dt_classifier.feature_importances_
+        indices = np.argsort(importances)[::-1]
+        top_n = min(20, len(X.columns))
+        
+        plt.figure(figsize=(10, 8))
+        plt.title(f"Top {top_n} Características más Importantes")
+        plt.barh(range(top_n), importances[indices[:top_n]], align="center")
+        plt.yticks(range(top_n), [X.columns[i] for i in indices[:top_n]])
+        plt.xlabel("Importancia")
+        plt.tight_layout()
+        plt.savefig(FIGURES_DIR / "feature_importance.png", dpi=300, bbox_inches="tight")
+        print(f"Importancia de características guardada como 'feature_importance.png'")

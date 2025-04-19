@@ -5,10 +5,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 import sys
 from pathlib import Path
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve, validation_curve, train_test_split, cross_val_score
-from sklearn.metrics import accuracy_score
 import seaborn as sns
 
 # Añadir directorio raíz al path

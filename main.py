@@ -11,6 +11,10 @@ from pathlib import Path
 from src.models import train_model, predict_model, evaluate_model
 import joblib
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
 
 MODELS_DIR = Path('models')
 DATA_DIR = Path('data')

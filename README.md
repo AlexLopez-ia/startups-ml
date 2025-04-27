@@ -1,74 +1,100 @@
-# Predicción de Éxito para Startups
+# Startups ML Project
+Tabla de contenidos
+¿De qué trata este repositorio?
+Estructura del proyecto
+Requisitos
+Pasos
+1. Preprocesamiento y análisis exploratorio
+2. Entrenamiento y evaluación de modelos
+3. Guardar y reutilizar el pipeline
+4. Uso del CLI (main.py)
+5. Servir el modelo con una API (FastAPI)
+6. (Opcional) Interfaz visual con Streamlit
+Buenas prácticas aplicadas
+Resultados y visualizaciones
 
-## Descripción
-Este proyecto utiliza técnicas de machine learning para predecir el éxito o fracaso de startups basándose en sus características iniciales. El objetivo es proporcionar insights valiosos para inversores y emprendedores, ayudando a identificar los factores más importantes que contribuyen al éxito de una startup.
+Este proyecto muestra el ciclo completo de un caso de machine learning en el mundo real:
+predecir el éxito o fracaso de startups a partir de sus características iniciales y su historial de financiación.
 
-## Características Principales
-- Análisis completo de datos de startups
-- Modelo predictivo de alta precisión
-- Identificación de factores clave de éxito
-- Visualizaciones informativas
-- Pipeline de procesamiento de datos automatizado
+Incluye:
 
-## Estructura del Proyecto
-```
+Análisis exploratorio, modelado, tuning y evaluación en notebooks
+Exportación de pipelines y modelos finales
+Un CLI profesional para entrenar, evaluar y predecir desde terminal
+Una API REST con FastAPI para servir el modelo y aceptar archivos CSV de entrada
+Estructura del proyecto
+CopyInsert
 startups-ml/
-├── data/               # Datos del proyecto
-├── notebooks/          # Jupyter notebooks
-├── src/               # Código fuente
-├── models/            # Modelos entrenados
-├── reports/           # Reportes y visualizaciones
-└── requirements.txt   # Dependencias
-```
-
-## Requisitos
-- Python 3.8+
-- Dependencias listadas en requirements.txt
-
-## Instalación
-1. Clonar el repositorio:
-```bash
-git clone https://github.com/tu-usuario/startups-ml.git
-cd startups-ml
-```
-
-2. Crear y activar entorno virtual:
-```bash
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-```
-
-3. Instalar dependencias:
-```bash
+│
+├── data/                    # Datasets originales y procesados
+├── notebooks/               # Notebooks por fase del proyecto
+├── models/                  # Modelos entrenados (.pkl)
+├── images/                  # Visualizaciones y gráficos SHAP
+├── src/
+│   ├── data/                # Scripts de gestión de datos
+│   ├── models/              # Scripts de entrenamiento, predicción y evaluación
+│   └── visualization/       # Funciones de visualización reutilizables
+├── main.py                  # CLI para entrenamiento, evaluación y predicción
+├── app.py                   # API REST (FastAPI)
+├── requirements.txt         # Dependencias Python
+└── README.md                # Este archivo
+Requisitos
+Python 3.9+
+Instala las dependencias:
+bash
+CopyInsert in Terminal
 pip install -r requirements.txt
-```
+Pasos
+1. Preprocesamiento y análisis exploratorio
+Explora y limpia los datos en los notebooks de /notebooks.
+Realiza análisis exploratorio, visualizaciones y preprocesamiento (encoding, imputación, etc).
+2. Entrenamiento y evaluación de modelos
+Entrena y ajusta modelos (Random Forest, XGBoost, etc.) en los notebooks.
+Evalúa con métricas como accuracy, precision, recall, f1-score y matriz de confusión.
+Analiza la importancia de las variables con SHAP.
+3. Guardar y reutilizar el pipeline
+Exporta el pipeline entrenado (preprocesado + modelo) como .pkl en /models.
+Exporta conjuntos de datos de test y ejemplos en /data.
+4. Uso del CLI (main.py)
+Entrena, evalúa y predice desde terminal:
 
-## Uso
-1. Explorar los notebooks en la carpeta `notebooks/`
-2. Ejecutar el pipeline de procesamiento:
-```bash
-python src/data/preprocess.py
-```
-3. Entrenar el modelo:
-```bash
-python src/models/train.py
-```
+bash
+CopyInsert
+# Entrenar el modelo
+python main.py --train
 
-## Documentación
-- `project_specs.md`: Especificaciones detalladas del proyecto
-- `data_specs.md`: Documentación del dataset
-- Notebooks con análisis detallado
+# Evaluar el modelo en test
+python main.py --evaluate
 
-## Contribución
-1. Fork el repositorio
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
+# Predecir sobre nuevos datos
+python main.py --predict data/nuevos_datos.csv
 
-## Licencia
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+# Ver ayuda
+python main.py --help
+5. Servir el modelo con una API (FastAPI)
+Lanza la API con:
 
-## Contacto
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter)
-Link del Proyecto: [https://github.com/tu-usuario/startups-ml](https://github.com/tu-usuario/startups-ml)
+bash
+CopyInsert in Terminal
+uvicorn app:app --reload
+Accede a la documentación interactiva en http://127.0.0.1:8000/docs
+Sube un archivo CSV en /predict y obtén predicciones al instante.
+6. (Opcional) Interfaz visual con Streamlit
+Puedes crear una interfaz visual sencilla para cargar archivos y mostrar resultados de forma amigable para usuarios no técnicos.
+
+Buenas prácticas aplicadas
+Estructura modular y profesional de carpetas
+Separación de lógica de datos, modelos y visualización
+Uso de pipelines para reproducibilidad
+Validación y manejo de errores en la API
+Documentación clara en notebooks y código
+Ejemplo de integración ML + API listo para producción/demostración
+Resultados y visualizaciones
+- **Accuracy en test:** ~0.97
+- **Matriz de confusión, SHAP y gráficos clave** en `/images`
+- **Modelo final** guardado en `/models/final_rf_pipeline.pkl`
+
+> **Pendiente:**
+> - Subir alguna imagen relevante del modelo (por ejemplo, matriz de confusión o gráfico SHAP) a la carpeta `/images` y enlazarla aquí en el README.
+> - Construir una interfaz visual sencilla (por ejemplo, con Streamlit) para probar el modelo de forma interactiva.
+

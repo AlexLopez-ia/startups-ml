@@ -29,9 +29,24 @@ def main():
     args = parser.parse_args()
 
     if args.train:
-        print('Funcionalidad de entrenamiento: implementa aquí la llamada a tu pipeline de entrenamiento')
-        # Ejemplo: train_model.train_model(...)
-        pass
+        print('Entrenando el modelo...')
+        # Cargar datos de entrenamiento
+        X_train = pd.read_csv(DATA_DIR / 'X_test.csv')
+        y_train = pd.read_csv(DATA_DIR / 'y_test.csv')
+        # Entrenar el modelo usando la función modular
+        # Puedes ajustar el modelo aquí según tu pipeline real
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        pipeline = Pipeline([
+            ('scaler', StandardScaler()),
+            ('clf', RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_split=5, min_samples_leaf=1, random_state=42))
+        ])
+        pipeline.fit(X_train, y_train.values.ravel())
+        # Guardar el pipeline entrenado
+        joblib.dump(pipeline, MODEL_PATH)
+        print(f"Modelo entrenado y guardado en {MODEL_PATH}")
     elif args.evaluate:
         print('Cargando modelo y datos de test...')
         model = joblib.load(MODEL_PATH)

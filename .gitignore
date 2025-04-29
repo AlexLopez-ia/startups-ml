@@ -63,7 +63,6 @@ ehthumbs.db
 Thumbs.db
 
 # Archivos y carpetas específicos de ML
-models/*.pkl
 models/*.joblib
 models/*.h5
 .pytest_cache/

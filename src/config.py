@@ -7,7 +7,7 @@ DATA_DIR = ROOT_DIR / "data"
 
 # Directorios
 RAW_DATA_DIR = DATA_DIR / "raw"  # Solo el directorio
-RAW_DATA_FILE = RAW_DATA_DIR / "startup data.csv"  # Ruta completa al archivo
+RAW_DATA_FILE = RAW_DATA_DIR / "startup_data.csv"  # Ruta completa al archivo
 
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 INTERIM_DATA_DIR = DATA_DIR / "interim"

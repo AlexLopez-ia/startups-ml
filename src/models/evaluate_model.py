@@ -19,6 +19,6 @@ def evaluate_model(model, X_test, y_test):
     """
     y_pred = model.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred, output_dict=True)
+    report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
     cm = confusion_matrix(y_test, y_pred)
     return acc, report, cm

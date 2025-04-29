@@ -98,5 +98,5 @@ pytest -v
 
 ## Resultados
 - **Accuracy en test:** ~0.97
-- Gráficos en `/images`
+- Gráficos en `/reports`
 - Modelo final: `/models/final_rf_pipeline.pkl`

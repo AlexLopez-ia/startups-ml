@@ -21,21 +21,26 @@ Este proyecto muestra el ciclo completo de un case study de Machine Learning par
 ## Estructura del proyecto
 ```text
 startups-ml/
-├── data/                  # Datos originales y procesados
-│   ├── raw/               # Datos crudos
-│   ├── interim/           # Datos limpiados (sin escalado)
-│   └── processed/         # Datos finales (preprocesados)
-├── notebooks/             # Notebooks de EDA y feature engineering
-├── src/                   # Código fuente
-│   ├── data/              # Preprocesamiento y gestión de datos
-│   ├── features/          # Funciones de ingeniería de características
-│   ├── models/            # Entrenamiento, predicción y evaluación
-│   └── visualization/     # Visualización reutilizable
-├── tests/                 # Tests unitarios con pytest
-├── models/                # Modelos exportados (.pkl)
-├── images/                # Gráficos y visualizaciones
-├── requirements.txt       # Dependencias Python
-└── README.md              # Documentación principal
+├── app.py                   # API con FastAPI para predicción via endpoint
+├── main.py                  # CLI para entrenar, evaluar y predecir localmente
+├── data/                    # Datos originales y procesados
+│   ├── raw/                 # Datos crudos
+│   ├── interim/             # Datos intermedios
+│   └── processed/           # Datos finales preprocesados
+├── data_specs.md            # Especificaciones del dataset
+├── notebooks/               # Notebooks de EDA e ingeniería de características
+├── src/                     # Código fuente
+│   ├── data/                # Preprocesamiento y gestión de datos
+│   ├── features/            # Funciones de ingeniería de características
+│   ├── models/              # Entrenamiento, predicción y evaluación
+│   └── visualization/       # Visualización reutilizable
+├── tests/                   # Tests unitarios con pytest
+├── models/                  # Modelos exportados (.pkl)
+├── images/                  # Gráficos y visualizaciones
+├── reports/                 # Informes y resultados
+├── requirements.txt         # Dependencias Python
+├── setup.py                 # Configuración del paquete
+└── README.md                # Documentación principal
 ```
 
 ## Instalación y requisitos
@@ -94,4 +99,4 @@ pytest -v
 ## Resultados
 - **Accuracy en test:** ~0.97
 - Gráficos en `/images`
-- Modelo final: `/models/final_pipeline.pkl`
+- Modelo final: `/models/final_rf_pipeline.pkl`

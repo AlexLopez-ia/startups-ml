@@ -3,15 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-import sys
-from pathlib import Path
 from sklearn.model_selection import learning_curve, validation_curve, train_test_split, cross_val_score
 import seaborn as sns
 
-# Añadir directorio raíz al path
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-
-from src.config import FIGURES_DIR, RANDOM_STATE, PROCESSED_DATA_DIR, TARGET_COLUMN, TEST_SIZE
+from ..config import FIGURES_DIR, RANDOM_STATE, PROCESSED_DATA_DIR, TARGET_COLUMN, TEST_SIZE, RAW_DATA_FILE
 
 def perform_bias_variance_analysis(X_train, X_test, y_train, y_test, 
                                   model_class=DecisionTreeClassifier,
@@ -248,7 +243,7 @@ if __name__ == "__main__":
         df = pd.read_csv(PROCESSED_DATA_DIR / "startup_data_processed.csv")
     except FileNotFoundError:
         print("Archivo procesado no encontrado. Cargando datos crudos...")
-        df = pd.read_csv(RAW_DATA_DIR / "startup_success_prediction.csv")
+        df = pd.read_csv(RAW_DATA_FILE)
     
     # --- Preprocesamiento: eliminar columnas irrelevantes ---
     columnas_a_eliminar = [

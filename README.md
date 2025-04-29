@@ -3,122 +3,95 @@
 ## Tabla de contenidos
 - [¿De qué trata este repositorio?](#de-qu%C3%A9-trata-este-repositorio)
 - [Estructura del proyecto](#estructura-del-proyecto)
-- [Requisitos](#requisitos)
-- [Pasos](#pasos)
-    - [1. Preprocesamiento y análisis exploratorio](#1-preprocesamiento-y-an%C3%A1lisis-exploratorio)
-    - [2. Entrenamiento y evaluación de modelos](#2-entrenamiento-y-evaluaci%C3%B3n-de-modelos)
-    - [3. Guardar y reutilizar el pipeline](#3-guardar-y-reutilizar-el-pipeline)
-    - [4. Uso del CLI (main.py)](#4-uso-del-cli-mainpy)
-    - [5. Servir el modelo con una API (FastAPI)](#5-servir-el-modelo-con-una-api-fastapi)
-    - [6. (Opcional) Interfaz visual con Streamlit](#6-opcional-interfaz-visual-con-streamlit)
+- [Instalación y requisitos](#instalaci%C3%B3n-y-requisitos)
+- [Uso](#uso)
+  - [Preprocesamiento](#preprocesamiento)
+  - [Ingeniería de características](#ingenier%C3%ADa-de-caracter%C3%ADsticas)
+  - [Entrenamiento y evaluación](#entrenamiento-y-evaluaci%C3%B3n)
+  - [Visualización](#visualizaci%C3%B3n)
+- [Tests](#tests)
 - [Buenas prácticas aplicadas](#buenas-pr%C3%A1cticas-aplicadas)
-- [Resultados y visualizaciones](#resultados-y-visualizaciones)
+- [Resultados](#resultados)
 
 ---
 
 ## ¿De qué trata este repositorio?
-Este proyecto muestra el ciclo completo de un caso de machine learning en el mundo real: predecir el éxito o fracaso de startups a partir de sus características iniciales y su historial de financiación.
-
-Incluye:
-- Análisis exploratorio, modelado, tuning y evaluación en notebooks
-- Exportación de pipelines y modelos finales
-- Un CLI profesional para entrenar, evaluar y predecir desde terminal
-- Una API REST con FastAPI para servir el modelo y aceptar archivos CSV de entrada
-
----
+Este proyecto muestra el ciclo completo de un case study de Machine Learning para predecir el éxito o fracaso de startups según sus características y su historial de financiación.
 
 ## Estructura del proyecto
 ```text
 startups-ml/
-│
-├── data/                    # Datasets originales y procesados
-├── notebooks/               # Notebooks por fase del proyecto
-├── models/                  # Modelos entrenados (.pkl)
-├── images/                  # Visualizaciones y gráficos SHAP
-├── src/
-│   ├── data/                # Scripts de gestión de datos
-│   ├── models/              # Scripts de entrenamiento, predicción y evaluación
-│   └── visualization/       # Funciones de visualización reutilizables
-├── main.py                  # CLI para entrenamiento, evaluación y predicción
-├── app.py                   # API REST (FastAPI)
-├── requirements.txt         # Dependencias Python
-└── README.md                # Este archivo
+├── data/                  # Datos originales y procesados
+│   ├── raw/               # Datos crudos
+│   ├── interim/           # Datos limpiados (sin escalado)
+│   └── processed/         # Datos finales (preprocesados)
+├── notebooks/             # Notebooks de EDA y feature engineering
+├── src/                   # Código fuente
+│   ├── data/              # Preprocesamiento y gestión de datos
+│   ├── features/          # Funciones de ingeniería de características
+│   ├── models/            # Entrenamiento, predicción y evaluación
+│   └── visualization/     # Visualización reutilizable
+├── tests/                 # Tests unitarios con pytest
+├── models/                # Modelos exportados (.pkl)
+├── images/                # Gráficos y visualizaciones
+├── requirements.txt       # Dependencias Python
+└── README.md              # Documentación principal
 ```
 
----
-
-## Requisitos
+## Instalación y requisitos
 - Python 3.9+
-- Instala las dependencias:
+- Crear y activar un entorno virtual:
+  ```bash
+  python -m venv venv
+  source venv/bin/activate   # o venv\Scripts\activate en Windows
+  ```
+- Instalar dependencias:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
+## Uso
+
+### Preprocesamiento
+Genera datos limpios e intermedios:
 ```bash
-pip install -r requirements.txt
+python -m src.data.preprocess
 ```
 
----
+### Ingeniería de características
+Las funciones están en `src.features.feature_engineering`:
+```python
+from src.features.feature_engineering import create_features
 
-## Pasos
-
-### 1. Preprocesamiento y análisis exploratorio
-- Explora y limpia los datos en los notebooks de `/notebooks`.
-- Realiza análisis exploratorio, visualizaciones y preprocesamiento (encoding, imputación, etc).
-
-### 2. Entrenamiento y evaluación de modelos
-- Entrena y ajusta modelos (Random Forest, XGBoost, etc.) en los notebooks.
-- Evalúa con métricas como accuracy, precision, recall, f1-score y matriz de confusión.
-- Analiza la importancia de las variables con SHAP.
-
-### 3. Guardar y reutilizar el pipeline
-- Exporta el pipeline entrenado (preprocesado + modelo) como `.pkl` en `/models`.
-- Exporta conjuntos de datos de test y ejemplos en `/data`.
-
-### 4. Uso del CLI (`main.py`)
-Entrena, evalúa y predice desde terminal:
-
-```bash
-# Entrenar el modelo
-python main.py --train
-
-# Evaluar el modelo en test
-python main.py --evaluate
-
-# Predecir sobre nuevos datos
-python main.py --predict data/nuevos_datos.csv
-
-# Ver ayuda
-python main.py --help
+df_feat = create_features(df)
 ```
 
-### 5. Servir el modelo con una API (FastAPI)
-Lanza la API con:
+### Entrenamiento y evaluación
+```python
+from src.models.train_model import train_model
+from src.models.evaluate_model import evaluate_model
 
-```bash
-uvicorn app:app --reload
+model = train_model(X_train, y_train, my_model)
+acc, report, cm = evaluate_model(model, X_test, y_test)
 ```
 
-- Accede a la documentación interactiva en [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- Sube un archivo CSV en `/predict` y obtén predicciones al instante.
+### Visualización
+Funciones en `src.visualization.visualize` para generar gráficos y SHAP.
 
-### 6. (Opcional) Interfaz visual con Streamlit
-Puedes crear una interfaz visual sencilla para cargar archivos y mostrar resultados de forma amigable para usuarios no técnicos.
-
----
+## Tests
+Ejecuta todos los tests:
+```bash
+pytest -v
+```
 
 ## Buenas prácticas aplicadas
-- Estructura modular y profesional de carpetas
-- Separación de lógica de datos, modelos y visualización
-- Uso de pipelines para reproducibilidad
-- Validación y manejo de errores en la API
-- Documentación clara en notebooks y código
-- Ejemplo de integración ML + API listo para producción/demostración
+- Estructura modular y separada por responsabilidad
+- Tipado, docstrings y copias seguras de DataFrame
+- Cobertura de tests alta (>90%)
+- Manejo de errores y warnings controlados
+- Serialización con joblib y pipelines de sklearn
 
----
-
-## Resultados y visualizaciones
+## Resultados
 - **Accuracy en test:** ~0.97
-- **Matriz de confusión, SHAP y gráficos clave** en `/images`
-- **Modelo final** guardado en `/models/final_rf_pipeline.pkl`
-
-> **Pendiente:**
-> - Subir alguna imagen relevante del modelo (por ejemplo, matriz de confusión o gráfico SHAP) a la carpeta `/images` y enlazarla aquí en el README.
-> - Construir una interfaz visual sencilla (por ejemplo, con Streamlit) para probar el modelo de forma interactiva.
+- Gráficos en `/images`
+- Modelo final: `/models/final_pipeline.pkl`

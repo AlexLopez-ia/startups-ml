@@ -16,3 +16,4 @@ fastapi
 uvicorn
 python-multipart
 pytest
+pathlib

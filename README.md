@@ -1,6 +1,6 @@
 # Startups-ML 
 
-Modelo de Machine Learning que predice el **éxito de startups** (éxito = adquirida, fracaso = cerrada) a partir de sus características iniciales y su historial de financiación. El proyecto está pensado como pieza de portfolio profesional en Venture Capital / Private Equity.
+Modelo de Machine Learning que predice el **éxito de startups** (éxito = adquirida, fracaso = cerrada) a partir de sus características iniciales y su historial de financiación. 
 
 ---
 ## Tabla de contenidos
@@ -68,9 +68,6 @@ $ cd startups-ml
 # Crea y activa entorno
 $ python -m venv venv
 $ source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Instala en editable
-$ pip install -e .
 
 # Instala deps extra de desarrollo (opcional)
 $ pip install -r requirements-dev.txt

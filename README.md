@@ -1,102 +1,131 @@
-# Startups ML Project
+# Startups-ML 
 
-## Tabla de contenidos
-- [¿De qué trata este repositorio?](#de-qu%C3%A9-trata-este-repositorio)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Instalación y requisitos](#instalaci%C3%B3n-y-requisitos)
-- [Uso](#uso)
-  - [Preprocesamiento](#preprocesamiento)
-  - [Ingeniería de características](#ingenier%C3%ADa-de-caracter%C3%ADsticas)
-  - [Entrenamiento y evaluación](#entrenamiento-y-evaluaci%C3%B3n)
-  - [Visualización](#visualizaci%C3%B3n)
-- [Tests](#tests)
-- [Buenas prácticas aplicadas](#buenas-pr%C3%A1cticas-aplicadas)
-- [Resultados](#resultados)
+Modelo de Machine Learning que predice el **éxito de startups** (éxito = adquirida, fracaso = cerrada) a partir de sus características iniciales y su historial de financiación. El proyecto está pensado como pieza de portfolio profesional en Venture Capital / Private Equity.
 
 ---
+## Tabla de contenidos
+1. [Visión general](#visión-general)
+2. [Dataset](#dataset)
+3. [Estructura del proyecto](#estructura-del-proyecto)
+4. [Instalación](#instalación)
+5. [Uso rápido](#uso-rápido)
+   1. [Preprocesamiento](#preprocesamiento)
+   2. [Entrenamiento y evaluación](#entrenamiento-y-evaluación)
+   3. [API FastAPI](#api-fastapi)
+6. [Metodología](#metodología)
+7. [Resultados](#resultados)
+8. [Buenas prácticas](#buenas-prácticas)
+9. [Contribución](#contribución)
+10. [Licencia](#licencia)
 
-## ¿De qué trata este repositorio?
-Este proyecto muestra el ciclo completo de un case study de Machine Learning para predecir el éxito o fracaso de startups según sus características y su historial de financiación.
+---
+## Visión general
+El objetivo es determinar, con datos disponibles en los primeros meses de vida de la compañía, si una startup acabará **adquirida** o **cerrada**. Se siguen todas las fases del ciclo de vida de un proyecto de ML:
 
+1. Ingesta y limpieza de datos.
+2. EDA e ingeniería de características.
+3. Entrenamiento de varios modelos (baseline, tuning, explicación con SHAP).
+4. Evaluación rigurosa (train/test + CV) y diagnóstico de sesgo-varianza.
+5. Exportación del modelo y despliegue vía **FastAPI**.
+
+---
+## Dataset
+| Fuente | Registros | Clases | Última actualización |
+|--------|-----------|--------|----------------------|
+| Crunchbase (copia anonimizada) | ≈ 50 000 | `success` / `failure` | 2013-06-01 |
+
+El archivo original vive en `data/raw/startup_data.csv`. El **dataset procesado** principal se guarda como `data/processed/startup_data_processed.csv`.
+
+---
 ## Estructura del proyecto
 ```text
 startups-ml/
-├── app.py                   # API con FastAPI para predicción via endpoint
-├── main.py                  # CLI para entrenar, evaluar y predecir localmente
-├── data/                    # Datos originales y procesados
-│   ├── raw/                 # Datos crudos
-│   ├── interim/             # Datos intermedios
-│   └── processed/           # Datos finales preprocesados
-├── data_specs.md            # Especificaciones del dataset
-├── notebooks/               # Notebooks de EDA e ingeniería de características
-├── src/                     # Código fuente
-│   ├── data/                # Preprocesamiento y gestión de datos
-│   ├── features/            # Funciones de ingeniería de características
-│   ├── models/              # Entrenamiento, predicción y evaluación
-│   └── visualization/       # Visualización reutilizable
-├── tests/                   # Tests unitarios con pytest
-├── models/                  # Modelos exportados (.pkl)
-├── images/                  # Gráficos y visualizaciones
-├── reports/                 # Informes y resultados
-├── requirements.txt         # Dependencias Python
-├── setup.py                 # Configuración del paquete
-└── README.md                # Documentación principal
+│
+├── data/                  # Datos crudos, intermedios y procesados
+├── notebooks/             # Jupyter notebooks (EDA, modelado, explicación)
+├── src/                   # Código fuente del paquete
+│   ├── config.py          # Rutas y constantes globales
+│   ├── data/              # Funciones de carga y limpieza
+│   ├── features/          # Ingeniería de características
+│   ├── models/            # Entrenamiento, evaluación, explicación
+│   └── visualization/     # Funciones de plotting reutilizables
+├── models/                # Modelos entrenados (.pkl)
+├── reports/               # Figuras y resultados finales
+├── tests/                 # Pytest unit tests
+├── app.py                 # API FastAPI
+├── setup.py               # Instalación editable
+├── requirements.txt       # Dependencias en producción
+└── README.md              # ¡Estás aquí!
 ```
 
-## Instalación y requisitos
-- Python 3.9+
-- Crear y activar un entorno virtual:
-  ```bash
-  python -m venv venv
-  source venv/bin/activate   # o venv\Scripts\activate en Windows
-  ```
-- Instalar dependencias:
-  ```bash
-  pip install -r requirements.txt
-  ```
-
-## Uso
-
-### Preprocesamiento
-Genera datos limpios e intermedios:
+---
+## Instalación
 ```bash
-python -m src.data.preprocess
+# Clona el repo
+$ git clone https://github.com/<user>/startups-ml.git
+$ cd startups-ml
+
+# Crea y activa entorno
+$ python -m venv venv
+$ source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Instala en editable
+$ pip install -e .
+
+# Instala deps extra de desarrollo (opcional)
+$ pip install -r requirements-dev.txt
 ```
 
-### Ingeniería de características
-Las funciones están en `src.features.feature_engineering`:
-```python
-from src.features.feature_engineering import create_features
-
-df_feat = create_features(df)
+---
+## Uso rápido
+### Preprocesamiento
+```bash
+python -m src.data.preprocess   # Genera data/processed/*.csv
 ```
 
 ### Entrenamiento y evaluación
 ```python
-from src.models.train_model import train_model
-from src.models.evaluate_model import evaluate_model
+from src.models.train import train_models
+from src.data.load_data import load_and_split_data
 
-model = train_model(X_train, y_train, my_model)
-acc, report, cm = evaluate_model(model, X_test, y_test)
+X_train, X_test, y_train, y_test = load_and_split_data()
+model_dict = train_models(X_train, y_train)
 ```
+Los resultados (métricas, figuras, modelos `.pkl`) se almacenan automáticamente en `reports/` y `models/`.
 
-### Visualización
-Funciones en `src.visualization.visualize` para generar gráficos y SHAP.
-
-## Tests
-Ejecuta todos los tests:
+### API FastAPI
 ```bash
-pytest -v
+uvicorn app:app --reload
 ```
+Accede a `http://localhost:8000/docs` para la documentación interactiva.
 
-## Buenas prácticas aplicadas
-- Estructura modular y separada por responsabilidad
-- Tipado, docstrings y copias seguras de DataFrame
-- Cobertura de tests alta (>90%)
-- Manejo de errores y warnings controlados
-- Serialización con joblib y pipelines de sklearn
+---
+## Metodología
+| Paso | Detalle |
+|------|---------|
+| Split | `train_test_split` estratificado 80/20 + Cross-Validation 5-fold |
+| Modelos | Árbol de decisión, Random Forest, Gradient Boosting, XGBoost |
+| Métricas | **Accuracy**, *precision*, *recall*, *F1* + matriz de confusión |
+| Explicabilidad | SHAP values (plots guardados en `/reports/figures/shap/`) |
+| Diagnóstico | Curvas de aprendizaje, validación y complejidad |
 
+---
 ## Resultados
-- **Accuracy en test:** ~0.97
-- Gráficos en `/reports`
-- Modelo final: `/models/final_rf_pipeline.pkl`
+| Modelo final | Accuracy test | F1 test |
+|--------------|---------------|---------|
+| XGBoost | **0.97** | 0.96 |
+
+Figuras clave se encuentran en `reports/figures/model_performance/` y `reports/figures/shap/`.
+
+---
+## Buenas prácticas
+- Rutas centralizadas en `src.config` usando `pathlib`.
+- Notebooks con título, descripción y ejecución limpia.
+- Datos originales **inmutables** (`data/raw/`), toda transformación genera archivos nuevos.
+- Serialización con `joblib` y pipelines de Scikit-learn.
+- Tests (Pytest) >90 % de cobertura.
+- Formateo automático `black` + `isort`.
+
+---
+## Licencia
+MIT 2025 Alex López

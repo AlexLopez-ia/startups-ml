@@ -125,4 +125,4 @@ Figuras clave se encuentran en `reports/figures/model_performance/` y `reports/f
 
 ---
 ## Licencia
-MIT 2025 Alex López
+Este proyecto está licenciado bajo los términos de la licencia **MIT**. Consulta el archivo [`LICENSE`](LICENSE) para más información.

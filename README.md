@@ -32,7 +32,7 @@ El objetivo es determinar, con datos disponibles en los primeros meses de vida d
 ## Dataset
 | Fuente | Registros | Clases | Última actualización |
 |--------|-----------|--------|----------------------|
-| Crunchbase (copia anonimizada) | ≈ 50 000 | `success` / `failure` | 2013-06-01 |
+| Crunchbase (copia anonimizada) | ≈ +900 startups | `success` / `failure` | 2013-06-01 |
 
 El archivo original vive en `data/raw/startup_data.csv`. El **dataset procesado** principal se guarda como `data/processed/startup_data_processed.csv`.
 
